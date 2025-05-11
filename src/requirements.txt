@@ -1,0 +1,7 @@
+langgraph
+pandas
+langchain-community
+sentence-transformers
+faiss-cpu
+openai
+numexpr
