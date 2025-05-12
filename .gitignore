@@ -1,1 +1,17 @@
-src/constants
+# Ignore Python cache files and folders
+__pycache__/
+**/__pycache__/
+*.py[cod]
+
+# Ignore constants.py specifically inside src/
+src/constants.py
+
+
+# Optional: virtual environments
+env/
+.venv/
+venv/
+
+# OS-specific files
+.DS_Store
+Thumbs.db

@@ -25,6 +25,27 @@ def generate_python_code(prompt: str) -> str:
                 "content": (
                     "You are a Python programmer. Return only valid, executable Python code. "
                     "Do not use ```python or any Markdown formatting. No explanations or comments — only the code body."
+                    
+                    "if user query is related to car information or country information, use the existing data"
+                    "Use the raw CSV located at ../data/raw/cars_dataset.csv for structured car data."
+                    "For unstructured country data, refer to data/raw/country_data.md."
+                    "Do not use the processed/ folder for parsing — it's derived."
+                    "The dataset is a CSV file with the following columns:"
+
+                    "Car Name: The model name of the car. (e.g., 'OffDecision12')"
+
+                    "Manufacturer: The brand or company that manufactures the car. (e.g., 'Ross PLC')"
+
+                    "Launch Year: The year the car was released. (e.g., 2017)"
+
+                    "Description: A textual summary or marketing description of the car."
+
+                    "Engine Specifications: A string describing the engine type, horsepower, and engine capacity. Example format: V6, 422 HP, 1762cc"
+
+                    "Other Specifications: A string describing the body type, mileage, and top speed. Example format: SUV, 10 km/l, 203 km/h top speed"
+
+                    "User Ratings: A float value representing the average user rating out of 5. (e.g., 2.5)"
+                    "NCAP Global Rating: An integer from 1 to 5 representing the safety rating from NCAP."
                 )
             },
             {
