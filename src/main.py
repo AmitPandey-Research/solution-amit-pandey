@@ -7,6 +7,7 @@ from utilities.dataloader import DataLoader
 from langchain_community.chat_models import ChatOpenAI
 from langchain_community.vectorstores import FAISS
 from langchain.chains import RetrievalQA, LLMMathChain
+from utilities.code_agent import run_code_agent
 
 
 os.environ["OPENAI_API_KEY"] = constants.ACCESS
@@ -26,6 +27,13 @@ if __name__ == "__main__":
                 print(f"[INFO] Indexing {file}")
                 DataLoader.create_index(file)
 
+    if command == "code_agent":
+        query = ' '.join(sys.argv[2:])
+        print(query)
+        run_code_agent(query)
+
+        
+
     if command == "chat":
         print("-----CHAT STARTED-----")
-        # agent_orchestrator_chat()  # Enable when ready
+        # agent_orchestrator_chat() 
