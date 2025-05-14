@@ -45,6 +45,7 @@ class Router:
         print("routing vectorstore",self.routing_vectorstore)
 
     def route(self, query: str) -> str:
+        print("query inside router",query)
         top_k = 3 
         filtered_docs = []
         seen_labels = set()
@@ -52,6 +53,7 @@ class Router:
         # self.routing_vectorstore is now a FAISS instance, so similarity_search will work.
         # It uses the embedding function it was loaded with.
         retrieved_docs = self.routing_vectorstore.similarity_search(query, k=10)
+        print("retrieved docs for router",retrieved_docs)
 
         for doc in retrieved_docs:
             # print(doc) # Uncomment for debugging retrieved docs
@@ -86,10 +88,9 @@ You are an intelligent classifier for a multi-agent system. Your job is to route
 - country_math_agent: For queries that require fetching country data first AND then performing a mathematical operation on that data. (e.g., "total population of listed Scandinavian countries", "average area of European countries in the dataset")
 - fallback: If the query doesn't fit any other category, is too ambiguous, or requests unsupported operations like live currency conversion.
 
-Here are some semantically similar past queries and how they were routed (if available):
-{example_text}
 
-Based on the examples (if any) and your understanding of the categories, classify the following query:
+
+Based on your understanding of the categories, classify the following query:
 "{query}"
 
 Return only one label from the list: car_agent, country_agent, math_agent, code_agent, car_math_agent, country_math_agent, fallback.
@@ -99,7 +100,7 @@ Return only one label from the list: car_agent, country_agent, math_agent, code_
         routing_chain = routing_prompt_template | self.llm | StrOutputParser()
         
         response = routing_chain.invoke({"example_text": example_text, "query": query}).strip().lower()
-
+        print("router response",response)
         valid_responses = {
             "car_agent", 
             "country_agent", 

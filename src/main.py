@@ -126,8 +126,8 @@ def agent_orchestrator_chat():
         query = state["query"]
         history = state["history"]
         context = "\n".join([f"User: {h['query']}\nAI: {h['response']}" for h in history]) # Adjusted key for response
-
-        refined_query = refine_query(query=query, context=context)
+        refined_query = query
+        #refined_query = refine_query(query=query, context=context)
         print(f"Original Query: {query}")
         print(f"Refined Query: {refined_query}")
 
