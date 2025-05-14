@@ -98,3 +98,4 @@ class DataLoader:
         embeddings = SentenceTransformerEmbeddings(model_name="all-mpnet-base-v2")
         vectordb = FAISS.from_documents(docs, embeddings)
         vectordb.save_local(index_name)
+        print("Index files saved at: ", file_path)
