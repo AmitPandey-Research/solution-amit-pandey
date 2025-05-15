@@ -1,3 +1,4 @@
 src/__pycache__
 src/utilities/__pycache__
 src/constants.py
+*.png

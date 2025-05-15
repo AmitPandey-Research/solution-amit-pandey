@@ -80,7 +80,7 @@ def save_python_script(code: str, filename: str) -> str:
 def execute_generated_code(file_path: str) -> str:
     """Executes the generated script and returns output and errors."""
     result = subprocess.run(
-        ["python", file_path],
+        [r"C:\Users\infinix\OneDrive\Desktop\Amit_Pandey\venv\ragbot312\Scripts\python.exe", file_path],
         capture_output=True,
         text=True
     )
