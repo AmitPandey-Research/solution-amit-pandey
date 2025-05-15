@@ -1,14 +1,9 @@
 import os
 from typing import TypedDict, List, Dict, Any, Callable, Optional
-
-#from src.utilities.memory import LocalMemory 
-
-
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import SentenceTransformerEmbeddings
-from langchain.docstore.document import Document # For DB creation helper
+from langchain.docstore.document import Document
 from constants import EMBEDDING_MODEL_NAME_FOR_ROUTING_DB
-# These examples are now primarily for the one-time DB creation.
 ROUTING_EXAMPLES_FOR_DB_CREATION = [
     ("What is the horsepower of the Honda Civic?", "car_agent"),
     ("Tell me about India’s population.", "country_agent"),
@@ -52,16 +47,7 @@ def _ensure_routing_vectorstore_exists():
             raise
     else:
         print(f"Routing vector store already exists at {ROUTING_VECTORDB_PATH}.")
-
-
-
-
-    
-    
-
-    
-    
-
+        
 def load_routing_vectorstore() -> FAISS:
     print("current working directory",os.getcwd())
     if not os.path.exists(ROUTING_VECTORDB_PATH):

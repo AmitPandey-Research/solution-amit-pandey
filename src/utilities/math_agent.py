@@ -12,4 +12,4 @@ def create_math_agent_chain() -> LLMMathChain:
 def run_math_agent(prompt: str) -> str:
     """Runs the math agent using the LLMMathChain."""
     math_chain = create_math_agent_chain()
-    return math_chain.invoke({"question": prompt})  # use invoke() with a dict input
+    return math_chain.invoke({"question": prompt}) 

@@ -6,11 +6,9 @@ from typing import Optional
 from constants import ACCESS
 import regex as re
 
-# OpenAI client setup
 client = OpenAI(api_key=ACCESS )  
 
 
-# Directory to store cached math scripts
 SCRIPT_DIR = os.path.join(os.path.dirname(__file__), "math_scripts")
 os.makedirs(SCRIPT_DIR, exist_ok=True)
 
