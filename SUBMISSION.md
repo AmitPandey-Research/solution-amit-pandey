@@ -81,12 +81,12 @@ This solution was built to meet the following core requirements:
 - `requirements.txt`: Lists project dependencies.
 
 
-## 5. Special Features and Design Desions
+## 5. Special Features and Design Decisions
 
 - **Custom Code Agent**: A versatile agent that generates and executes Python scripts based on the provided data.
-- **Conversation History**: Implemented saving and loading of conversation history for a more continuous user experience (Optional).
+- **Conversation History**: Implemented saving and loading of conversation history and query refinement for a more continuous user experience (Optional).
 - **Meta Data Filter**: Enhanced the Car Agent retrieval accuracy and precision by pre-processing the data to extract metadat and using that for filtering the search results.
-- **Cost Minimization**: Reduced LLM calls by using regex and other rule based decision making.
+- **Cost and Speed Optimization**: Reduced LLM calls by using Caching, regex and other rule based decision making.
 
 ## 6. Future Enhancements
 

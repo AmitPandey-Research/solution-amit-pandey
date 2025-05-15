@@ -1,4 +1,7 @@
 import os
+import sys
+import glob
+from utilities.dataloader import DataLoader
 print("current directory",os.getcwd())
 from typing import TypedDict, List, Dict, Any, Callable, Optional
 from langgraph.graph import StateGraph, END
@@ -294,4 +297,13 @@ def agent_orchestrator_chat():
 
 
 if __name__ == "__main__":
-    agent_orchestrator_chat()
+    if len(sys.argv) < 2:
+        agent_orchestrator_chat()
+
+    elif(sys.argv[1] == "create_db"):
+        files = glob.glob("../data/raw/*")
+        for file in files:
+            if os.path.isfile(file):
+                print(f"[INFO] Indexing {file}")
+                DataLoader.create_index(file)
+        
