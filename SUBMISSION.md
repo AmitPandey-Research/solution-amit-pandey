@@ -18,7 +18,7 @@ This solution was built to meet the following core requirements:
 ### 2.1. Data Chunking & Storage
 - **Implementation**: The provided data dumps (Car and Country) were processed and chunked into smaller, manageable units. This is crucial for efficient retrieval by the RAG agents.
 - **Storage**: FAISS (Facebook AI Similarity Search) was chosen as the vector store. This allows for fast and scalable similarity searches on the embedded data chunks. Embeddings were generated using the `all-mpnet-base-v2` model from SentenceTransformers, known for its strong performance in semantic understanding.
-- **Rationale**: FAISS provides a good balance of speed and resource usage for local vector database needs. `all-mpnet-base-v2` offers high-quality embeddings suitable for discerning semantic relationships in the data.
+- **Rationale**: FAISS provides a good balance of speed and resource usage for local vector database needs. `all-mpnet-base-v2` offers high-quality embeddings suitable for discerning semantic relationships in the data. Both are open source and free to use.
 
 ### 2.2. Retrieval-Augmented Generation (RAG)
 - **Implementation**: Each specialized agent (Car and Country) incorporates RAG. When a query is received, the agent first retrieves relevant chunks from its dedicated vector store. This retrieved context is then used by a language model (via OpenAI API) to generate a final, informed answer.
@@ -49,12 +49,12 @@ This solution was built to meet the following core requirements:
 
 - **Vector Store (FAISS)**:
     - *Decision*: Use FAISS for local vector storage.
-    - *Pros*: High speed for similarity search, CPU version is accessible.
-    - *Trade-offs*: Requires loading the index into memory, which could be a concern for extremely large datasets not encountered in this project's scope.
+    - *Pros*: Free. High speed for similarity search, CPU version is accessible.
+    - *Trade-offs*: Requires loading the index into memory, which could be a concern for extremely large datasets not encountered in this project's scope. Does not provide advance weighted hybrid search and filter options.
 
 - **Embedding Model (`all-mpnet-base-v2`)**:
     - *Decision*: Use `all-mpnet-base-v2` for generating text embeddings.
-    - *Pros*: Excellent semantic understanding, widely used and well-tested.
+    - *Pros*: Free. Excellent semantic understanding, widely used and well-tested.
     - *Trade-offs*: Larger model size and higher one-time computation cost for embedding the datasets compared to smaller models, but beneficial for accuracy.
 
 - **Multi-Agent Architecture with LangGraph**:
@@ -62,10 +62,6 @@ This solution was built to meet the following core requirements:
     - *Pros*: Modularity, specialization, easier maintenance, and clear flow control via LangGraph.
     - *Trade-offs*: Increased initial setup complexity compared to a monolithic approach, and careful state management is required across graph transitions.
 
-- **API Key Management**:
-    - *Decision*: API keys are currently in a `constants.py` file.
-    - *Pros*: Simple for development and local testing.
-    - *Trade-offs*: Not secure for production. The documentation recommends moving to environment variables for a production deployment.
 
 ## 4. Project Structure and Components
 
@@ -78,16 +74,23 @@ This solution was built to meet the following core requirements:
     - `code_agent.py`: A versatile agent that generates and executes Python scripts. It can be used for a variety of tasks, including:
         - Performing statistical analysis on the provided datasets (Car and Country data).
         - Generating distribution visualizations based on the data.
-        - Handling general programming or code-related queries by creating and running appropriate Python scripts.
-        Its primary mechanism involves using an LLM (GPT-3.5-turbo) to generate Python code based on the user's prompt, saving this code to a temporary script, and then executing it to produce results, which can include textual output (like statistical summaries) or trigger the creation of visualization files.
+        - Handling general programming or code-related queries by creating and running appropriate Python scripts: to produce results, which can include textual output (like statistical summaries) or trigger the creation of visualization files.
     - `router.py`: Analyzes user queries and directs them to the appropriate agent.
     - `memory.py`: Manages conversation history (though current implementation is basic).
 - `data/vectordb/`: Stores the FAISS vector databases.
 - `requirements.txt`: Lists project dependencies.
 
-## 5. Potential Future Enhancements
 
-- **Persistent Conversation History**: Implement saving and loading of conversation history for a more continuous user experience.
+## 5. Special Features and Design Desions
+
+- **Custom Code Agent**: A versatile agent that generates and executes Python scripts based on the provided data.
+- **Conversation History**: Implemented saving and loading of conversation history for a more continuous user experience (Optional).
+- **Meta Data Filter**: Enhanced the Car Agent retrieval accuracy and precision by pre-processing the data to extract metadat and using that for filtering the search results.
+- **Cost Minimization**: Reduced LLM calls by using regex and other rule based decision making.
+
+## 6. Future Enhancements
+
+- **Conversation History and Persona Based State Management** 
 - **Advanced Error Verification**: Enhance the Math Agent's verification capabilities.
 - **Asynchronous Operations**: For improved responsiveness, especially with multiple agent calls or I/O bound tasks.
 - **Dynamic Agent Selection**: Explore more sophisticated routing mechanisms, potentially using an LLM for routing if complexity grows.

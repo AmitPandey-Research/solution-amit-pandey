@@ -7,6 +7,7 @@ This document outlines the architecture and interaction flow of the RAG (Retriev
 The core of the application is an agentic workflow managed by LangGraph. The `agent_orchestrator_chat` function in `src/main.py` initializes and runs this graph.
 
 ```mermaid
+%%{init: {'theme': 'base', 'themeVariables': { 'background': '#FF0000' }}}%%
 graph TD
     A[User Query] --> B(route_query_node);
     B -- car_agent / car_math_agent --> C{CarAgentNode};
@@ -35,13 +36,19 @@ graph TD
         G
     end
 
-    classDef agentNode fill:#f9f,stroke:#333,stroke-width:2px;
-    classDef routerNode fill:#ccf,stroke:#333,stroke-width:2px;
-    classDef endNode fill:#cfc,stroke:#333,stroke-width:2px;
+%% STYLE DEFINITIONS
+classDef agentNode fill:#1f1f1f,stroke:#ff6666,stroke-width:2px,color:#ffffff,font-weight:bold;
+classDef routerNode fill:#1f1f1f,stroke:#3399ff,stroke-width:2px,color:#ffffff,font-weight:bold;
+classDef endNode fill:#1f1f1f,stroke:#33cc33,stroke-width:2px,color:#ffffff,font-weight:bold;
+classDef startNode fill:#1f1f1f,stroke:#cccccc,stroke-width:2px,color:#ffffff,font-weight:bold;
 
-    class B routerNode;
-    class C,D,E,F,G agentNode;
-    class H endNode;
+%% ASSIGN STYLES
+class A startNode;
+class B routerNode;
+class C,D,E,F,G agentNode;
+class H endNode;
+
+
 ```
 
 **Explanation:**
@@ -66,19 +73,19 @@ graph TD
 
 ## 2. Router Logic (`src/utilities/router.py`)
 
-The `Router` class classifies the user query to determine the appropriate agent or agent combination.
-
 ```mermaid
 graph TD
-    R_A[User Query] --> R_B{Router.route()};
-    R_B -- Similarity Search against Routing Examples --> R_C{Filtered Few-Shot Examples};
-    R_C -- Form Prompt with Examples and Query --> R_D{LLM (gpt-3.5-turbo)};
-    R_D -- Classification --> R_E{Route Decision (e.g., car_agent, math_agent)};
-    R_E -- Validate Response --> R_F[Return Validated Route Label];
+    R_A[User Query] --> R_B{"Router.route()"};
+    R_B -- "Similarity Search against Routing Examples" --> R_C{"Filtered Few-Shot Examples"};
+    R_C -- "Form Prompt with Examples and Query" --> R_D{"LLM (gpt-3.5-turbo)"};
+    R_D -- Classification --> R_E{"Route Decision (e.g., car_agent, math_agent)"};
+    R_E -- "Validate Response" --> R_F[Return Validated Route Label];
 
-    classDef routerInternal fill:#ccf,stroke:#333,stroke-width:1px;
+    classDef routerInternal fill:#000000,stroke:#333,stroke-width:0.1px;
     class R_B,R_C,R_D,R_E routerInternal;
 ```
+
+The `Router` class classifies the user query to determine the appropriate agent or agent combination.
 **Explanation:**
 1.  The `Router.route(query)` method is called.
 2.  It performs a similarity search using `routing_vectorstore` (loaded by `load_routing_vectorstore`) to find relevant examples for few-shot prompting.
@@ -88,22 +95,20 @@ graph TD
 6.  The validated route label is returned.
 
 ## 3. Car Agent Logic (`src/utilities/car_agent.py`)
-
-The `CarAgent` class handles queries related to car data.
-
 ```mermaid
 graph TD
-    CA_A[Query from GraphState] --> CA_B{CarAgent.run()};
-    CA_B --> CA_C{refine_query (currently returns original)};
-    CA_C --> CA_D{extract_filter_criteria (RegEx)};
-    CA_D -- Potentially with Filters --> CA_E{vector_store.similarity_search (FAISS)};
-    CA_E -- Retrieved Documents --> CA_F{Format Context};
-    CA_F --> CA_G{RetrievalQA.from_chain_type (LLM with Context)};
-    CA_G -- Answer --> CA_H[Return Result to GraphState];
+    CA_A["Query from GraphState"] --> CA_B{"CarAgent.run()"};
+    CA_B --> CA_C{"refine_query (currently returns original)"};
+    CA_C --> CA_D{"extract_filter_criteria (RegEx)"};
+    CA_D -- "Potentially with Filters" --> CA_E{"vector_store.similarity_search (FAISS)"};
+    CA_E -- "Retrieved Documents" --> CA_F{"Format Context"};
+    CA_F --> CA_G{"RetrievalQA.from_chain_type (LLM with Context)"};
+    CA_G -- "Answer" --> CA_H["Return Result to GraphState"];
 
-    classDef carAgentInternal fill:#f9f,stroke:#333,stroke-width:1px;
+    classDef carAgentInternal fill:#000000,stroke:#333,stroke-width:1px;
     class CA_B,CA_C,CA_D,CA_E,CA_F,CA_G carAgentInternal;
 ```
+The `CarAgent` class handles queries related to car data.
 
 **Explanation:**
 1.  The `CarAgent.run(query)` method is invoked by the LangGraph node.
@@ -115,28 +120,27 @@ graph TD
 7.  The final answer is returned and updated in the `GraphState`.
 
 ## 4. Country Agent Logic (`src/utilities/country_agent.py`)
-
-The `CountryAgent` class handles queries related to country data using a LangChain Expression Language (LCEL) chain.
-
 ```mermaid
 graph TD
-    CoA_A[Query from GraphState] --> CoA_B{CountryAgent.run()};
-    CoA_B -- Invoke LCEL Chain --> CoA_C{LCEL Chain Execution};
-    CoA_C --> CoA_D{vector_store.as_retriever()};
-    CoA_D -- Retrieved Documents --> CoA_E{retrieve_and_print (Formats Context)};
-    CoA_E --> CoA_F{PromptTemplate (with Context & Question)};
-    CoA_F --> CoA_G{LLM (gpt-3.5-turbo)};
-    CoA_G -- Parsed Answer --> CoA_H[Return Result to GraphState];
+    CoA_A["Query from GraphState"] --> CoA_B{"CountryAgent.run()"};
+    CoA_B -- "Invoke LCEL Chain" --> CoA_C{"LCEL Chain Execution"};
+    CoA_C --> CoA_D{"vector_store.as_retriever()"};
+    CoA_D -- "Retrieved Documents" --> CoA_E{"retrieve_and_print (Formats Context)"};
+    CoA_E --> CoA_F{"PromptTemplate (with Context & Question)"};
+    CoA_F --> CoA_G{"LLM (gpt-3.5-turbo)"};
+    CoA_G -- "Parsed Answer" --> CoA_H["Return Result to GraphState"];
 
-    subgraph LCEL Chain
+    subgraph "LCEL Chain"
         CoA_D --> CoA_E;
         CoA_E --> CoA_F;
         CoA_F --> CoA_G;
     end
 
     classDef countryAgentInternal fill:#f9f,stroke:#333,stroke-width:1px;
-    class CoA_B, CoA_C countryAgentInternal;
+    class CoA_B, CoA_CcountryAgentInternal;
 ```
+
+The `CountryAgent` class handles queries related to country data using a LangChain Expression Language (LCEL) chain.
 
 **Explanation:**
 1.  The `CountryAgent.run(query)` method is invoked.
@@ -150,20 +154,18 @@ graph TD
 4.  The final answer is returned.
 
 ## 5. Math Agent Logic (`src/utilities/math_agent.py`)
-
-The `run_math_agent` function handles mathematical calculations.
-
 ```mermaid
 graph TD
-    MA_A[Query/Prompt from GraphState] --> MA_B{run_math_agent()};
-    MA_B --> MA_C{create_math_agent_chain()};
-    MA_C --> MA_D{LLMMathChain (LLM + Python REPL)};
-    MA_D -- Invoke with Query --> MA_E[Return Numerical Result/Explanation];
+    MA_A["Query/Prompt from GraphState"] --> MA_B{"run_math_agent()"};
+    MA_B --> MA_C{"create_math_agent_chain()"};
+    MA_C --> MA_D{"LLMMathChain (LLM + Python REPL)"};
+    MA_D -- "Invoke with Query" --> MA_E["Return Numerical Result/Explanation"];
 
-    classDef mathAgentInternal fill:#f9f,stroke:#333,stroke-width:1px;
+    classDef mathAgentInternal fill:#000f,stroke:#333,stroke-width:1px;
     class MA_B,MA_C,MA_D mathAgentInternal;
 ```
 
+The `run_math_agent` function handles mathematical calculations.
 **Explanation:**
 1.  The `run_math_agent(prompt)` function is called. The prompt might be the original user query or a derived query (e.g., "Based on data X, calculate Y").
 2.  `create_math_agent_chain()`: Initializes an `LLMMathChain`. This chain uses an LLM to understand the math problem and Python to execute it.
@@ -173,29 +175,27 @@ graph TD
 ## 6. Code Agent Logic (`src/utilities/code_agent.py`)
 
 The `run_code_agent` function generates and executes Python code for various tasks, including statistical analysis and visualizations.
-
 ```mermaid
 graph TD
-    CDA_A[Prompt from GraphState] --> CDA_B{run_code_agent()};
-    CDA_B --> CDA_C{get_hashed_filename (for caching)};
-    CDA_C -- Check if script exists --> CDA_D{Script Cached?};
-    CDA_D -- Yes --> CDA_G{execute_generated_code()};
-    CDA_D -- No --> CDA_E{generate_python_code (LLM: gpt-3.5-turbo)};
-    CDA_E -- Generated Python Code --> CDA_F{save_python_script()};
+    CDA_A["Prompt from GraphState"] --> CDA_B{"run_code_agent()"};
+    CDA_B --> CDA_C{"get_hashed_filename (for caching)"};
+    CDA_C -- "Check if script exists" --> CDA_D{"Script Cached?"};
+    CDA_D -- "Yes" --> CDA_G{"execute_generated_code()"};
+    CDA_D -- "No" --> CDA_E{"generate_python_code"};
+    CDA_E -- "Generated Python Code" --> CDA_F{"save_python_script()"};
     CDA_F --> CDA_G;
-    CDA_G -- Script Output (stdout/stderr) / Path to Visualization --> CDA_H[Return Result/Path];
+    CDA_G -- "Script Output (stdout/stderr) / Path to Visualization" --> CDA_H["Return Result/Path"];
 
-    classDef codeAgentInternal fill:#f9f,stroke:#333,stroke-width:1px;
+    classDef codeAgentInternal fill:#00f,stroke:#333,stroke-width:1px;
     class CDA_B,CDA_C,CDA_D,CDA_E,CDA_F,CDA_G codeAgentInternal;
 ```
-
 **Explanation:**
 1.  The `run_code_agent(prompt)` function is called.
 2.  `get_hashed_filename`: Creates a unique filename based on the prompt hash for caching purposes.
 3.  **Caching**:
     *   If a script with this filename already exists, it skips generation.
 4.  **Code Generation (if not cached)**:
-    *   `generate_python_code(prompt)`: Sends the prompt to `gpt-3.5-turbo` (with specific system instructions to return only Python code and use provided data sources if relevant).
+    *   `generate_python_code(prompt)`: Generate python code based on system specific constraints.
     *   `save_python_script()`: Saves the generated code to the hashed filename in the `src/utilities/math_scripts` directory.
 5.  `execute_generated_code(script_path)`:
     *   Runs the Python script using `subprocess.run()`.
